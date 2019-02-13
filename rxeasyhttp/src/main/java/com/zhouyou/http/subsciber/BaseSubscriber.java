@@ -63,7 +63,7 @@ public abstract class BaseSubscriber<T> extends DisposableObserver<T> {
     public void onNext(@NonNull T t) {
         HttpLog.e("-->http is onNext");
     }
-
+    
     @Override
     public final void onError(java.lang.Throwable e) {
         HttpLog.e("-->http is onError");

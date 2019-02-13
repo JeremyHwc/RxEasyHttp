@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.zhouyou.http.demo"
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -18,12 +18,12 @@ android {
         debug {
 
         }
-        release {
-            keyAlias 'zy' //修改成自己的签名
-            keyPassword 'zy15102951169'//修改成自己的签名
-            storeFile file('D:/zhouyou.jks')//修改成自己的签名
-            storePassword 'zy15102951169'//修改成自己的签名
-        }
+//        release {
+//            keyAlias 'zy' //修改成自己的签名
+//            keyPassword 'zy15102951169'//修改成自己的签名
+//            storeFile file('D:/zhouyou.jks')//修改成自己的签名
+//            storePassword 'zy15102951169'//修改成自己的签名
+//        }
     }
     buildTypes {
         release {
@@ -31,13 +31,13 @@ android {
             zipAlignEnabled true //是否支持Zip Align
             shrinkResources true //是否清理无用资源
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
     lintOptions {
@@ -53,14 +53,14 @@ android {
          targetCompatibility 1.8
          sourceCompatibility 1.8
      }*/
-    android.applicationVariants.all { variant ->
+    /*android.applicationVariants.all { variant ->
         variant.outputs.each { output ->
             if (output.outputFile != null && output.outputFile.name.endsWith('.apk')) {
                 def name = "${rootDir}/apk/rxeasyhttp-demo.apk"
                 output.outputFile = file(name)
             }
         }
-    }
+    }*/
 }
 
 /*repositories {
@@ -77,7 +77,7 @@ dependencies {
     compile project(':rxeasyhttp')
     //compile 'com.zhouyou:rxeasyhttp:2.0.4'
     //compile(name:'rxeasyhttp-release', ext:'aar')
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:27.1.1'
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     compile 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     testCompile 'junit:junit:4.12'

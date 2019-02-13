@@ -46,7 +46,7 @@ import io.reactivex.exceptions.Exceptions;
 /**
  * <p>描述：缓存统一入口类</p>
  * <p>
- * <p>主要实现技术：Rxjava+DiskLruCache(jakewharton大神开源的LRU库)</p>
+ * <p>主要实现技术：Rxjava + DiskLruCache(jakewharton大神开源的LRU库)</p>
  * <p>
  * <p>
  * 主要功能：<br>
@@ -79,6 +79,7 @@ public final class RxCache {
     private final String cacheKey;                                      //缓存的key
     private final long cacheTime;                                       //缓存的时间 单位:秒
     private final IDiskConverter diskConverter;                         //缓存的转换器
+
     private final File diskDir;                                         //缓存的磁盘目录，默认是缓存目录
     private final int appVersion;                                       //缓存的版本
     private final long diskMaxSize;                                     //缓存的磁盘大小
@@ -91,10 +92,12 @@ public final class RxCache {
         this.context = builder.context;
         this.cacheKey = builder.cachekey;
         this.cacheTime = builder.cacheTime;
-        this.diskDir = builder.diskDir;
+
         this.appVersion = builder.appVersion;
-        this.diskMaxSize = builder.diskMaxSize;
+        this.diskDir = builder.diskDir;
         this.diskConverter = builder.diskConverter;
+        this.diskMaxSize = builder.diskMaxSize;
+
         cacheCore = new CacheCore(new LruDiskCache(diskConverter, diskDir, appVersion, diskMaxSize));
     }
 
@@ -102,61 +105,12 @@ public final class RxCache {
         return new Builder(this);
     }
 
-    /**
-     * 缓存transformer
-     *
-     * @param cacheMode 缓存类型
-     * @param type      缓存clazz
-     */
-    @SuppressWarnings(value={"unchecked", "deprecation"})
-    public <T> ObservableTransformer<T, CacheResult<T>> transformer(CacheMode cacheMode, final Type type) {
-        final IStrategy strategy = loadStrategy(cacheMode);//获取缓存策略
-        return new ObservableTransformer<T, CacheResult<T>>() {
-            @Override
-            public ObservableSource<CacheResult<T>> apply(@NonNull Observable<T> upstream) {
-                HttpLog.i("cackeKey=" + RxCache.this.cacheKey);
-                Type tempType = type;
-                if (type instanceof ParameterizedType) {//自定义ApiResult
-                    Class<T> cls = (Class) ((ParameterizedType) type).getRawType();
-                    if (CacheResult.class.isAssignableFrom(cls)) {
-                        tempType = Utils.getParameterizedType(type, 0);
-                    }
-                }
-                return strategy.execute(RxCache.this, RxCache.this.cacheKey, RxCache.this.cacheTime, upstream, tempType);
-            }
-        };
-    }
-
-    private static abstract class SimpleSubscribe<T> implements ObservableOnSubscribe<T> {
-        @Override
-        public void subscribe(@NonNull ObservableEmitter<T> subscriber) throws Exception {
-            try {
-                T data = execute();
-                if (!subscriber.isDisposed()) {
-                    subscriber.onNext(data);
-                }
-            } catch (Throwable e) {
-                HttpLog.e(e.getMessage());
-                if (!subscriber.isDisposed()) {
-                    subscriber.onError(e);
-                }
-                Exceptions.throwIfFatal(e);
-                //RxJavaPlugins.onError(e);
-                return;
-            }
-
-            if (!subscriber.isDisposed()) {
-                subscriber.onComplete();
-            }
-        }
-
-        abstract T execute() throws Throwable;
-    }
 
     /**
      * 获取缓存
+     *
      * @param type 保存的类型
-     * @param key 缓存key
+     * @param key  缓存key
      */
     public <T> Observable<T> load(final Type type, final String key) {
         return load(type, key, -1);
@@ -170,12 +124,13 @@ public final class RxCache {
      * @param time 保存时间
      */
     public <T> Observable<T> load(final Type type, final String key, final long time) {
-        return Observable.create(new SimpleSubscribe<T>() {
-            @Override
-            T execute() {
-                return cacheCore.load(type, key, time);
-            }
-        });
+        return Observable
+                .create(new SimpleSubscribe<T>() {
+                    @Override
+                    T execute() {
+                        return cacheCore.load(type, key, time);
+                    }
+                });
     }
 
     /**
@@ -185,49 +140,53 @@ public final class RxCache {
      * @param value 缓存Value
      */
     public <T> Observable<Boolean> save(final String key, final T value) {
-        return Observable.create(new SimpleSubscribe<Boolean>() {
-            @Override
-            Boolean execute() throws Throwable {
-                cacheCore.save(key, value);
-                return true;
-            }
-        });
+        return Observable
+                .create(new SimpleSubscribe<Boolean>() {
+                    @Override
+                    Boolean execute() throws Throwable {
+                        cacheCore.save(key, value);
+                        return true;
+                    }
+                });
     }
 
     /**
      * 是否包含
      */
     public Observable<Boolean> containsKey(final String key) {
-        return Observable.create(new SimpleSubscribe<Boolean>() {
-            @Override
-            Boolean execute() throws Throwable {
-                return cacheCore.containsKey(key);
-            }
-        });
+        return Observable
+                .create(new SimpleSubscribe<Boolean>() {
+                    @Override
+                    Boolean execute() throws Throwable {
+                        return cacheCore.containsKey(key);
+                    }
+                });
     }
 
     /**
      * 删除缓存
      */
     public Observable<Boolean> remove(final String key) {
-        return Observable.create(new SimpleSubscribe<Boolean>() {
-            @Override
-            Boolean execute() throws Throwable {
-                return cacheCore.remove(key);
-            }
-        });
+        return Observable
+                .create(new SimpleSubscribe<Boolean>() {
+                    @Override
+                    Boolean execute() throws Throwable {
+                        return cacheCore.remove(key);
+                    }
+                });
     }
 
     /**
      * 清空缓存
      */
     public Observable<Boolean> clear() {
-        return Observable.create(new SimpleSubscribe<Boolean>() {
-            @Override
-            Boolean execute() throws Throwable {
-                return cacheCore.clear();
-            }
-        });
+        return Observable
+                .create(new SimpleSubscribe<Boolean>() {
+                    @Override
+                    Boolean execute() throws Throwable {
+                        return cacheCore.clear();
+                    }
+                });
     }
 
     /**
@@ -318,9 +277,6 @@ public final class RxCache {
 
         /**
          * 默认为缓存路径
-         *
-         * @param directory
-         * @return
          */
         public Builder diskDir(File directory) {
             this.diskDir = directory;
@@ -405,6 +361,55 @@ public final class RxCache {
             }
             return new File(cacheDir.getPath() + File.separator + uniqueName);
         }
+    }
 
+    /**
+     * 缓存transformer
+     *
+     * @param cacheMode 缓存类型
+     * @param type      缓存clazz
+     */
+    @SuppressWarnings(value = {"unchecked", "deprecation"})
+    public <T> ObservableTransformer<T, CacheResult<T>> transformer(CacheMode cacheMode, final Type type) {
+        final IStrategy strategy = loadStrategy(cacheMode);//获取缓存策略
+        return new ObservableTransformer<T, CacheResult<T>>() {
+            @Override
+            public ObservableSource<CacheResult<T>> apply(@NonNull Observable<T> upstream) {
+                HttpLog.i("cackeKey=" + RxCache.this.cacheKey);
+                Type tempType = type;
+                if (type instanceof ParameterizedType) {//自定义ApiResult
+                    Class<T> cls = (Class) ((ParameterizedType) type).getRawType();
+                    if (CacheResult.class.isAssignableFrom(cls)) {
+                        tempType = Utils.getParameterizedType(type, 0);
+                    }
+                }
+                return strategy.execute(RxCache.this, RxCache.this.cacheKey, RxCache.this.cacheTime, upstream, tempType);
+            }
+        };
+    }
+
+    private static abstract class SimpleSubscribe<T> implements ObservableOnSubscribe<T> {
+        @Override
+        public void subscribe(@NonNull ObservableEmitter<T> subscriber) throws Exception {
+            try {
+                T data = execute();
+                if (!subscriber.isDisposed()) {
+                    subscriber.onNext(data);
+                }
+            } catch (Throwable e) {
+                HttpLog.e(e.getMessage());
+                if (!subscriber.isDisposed()) {
+                    subscriber.onError(e);
+                }
+                Exceptions.throwIfFatal(e);
+                //RxJavaPlugins.onError(e);
+                return;
+            }
+            if (!subscriber.isDisposed()) {
+                subscriber.onComplete();
+            }
+        }
+
+        abstract T execute() throws Throwable;
     }
 }

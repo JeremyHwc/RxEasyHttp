@@ -193,8 +193,8 @@ public final class EasyHttp {
      * 并不是框架错误,如果不想每次打印,这里可以关闭异常显示
      */
     public EasyHttp debug(String tag, boolean isPrintException) {
-        String tempTag = TextUtils.isEmpty(tag)?"RxEasyHttp_":tag;
-        if(isPrintException){
+        String tempTag = TextUtils.isEmpty(tag) ? "RxEasyHttp_" : tag;
+        if (isPrintException) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(tempTag, isPrintException);
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             okHttpClientBuilder.addInterceptor(loggingInterceptor);
@@ -353,7 +353,8 @@ public final class EasyHttp {
      * 全局的缓存过期时间
      */
     public EasyHttp setCacheTime(long cacheTime) {
-        if (cacheTime <= -1) cacheTime = DEFAULT_CACHE_NEVER_EXPIRE;
+        if (cacheTime <= -1)
+            cacheTime = DEFAULT_CACHE_NEVER_EXPIRE;
         mCacheTime = cacheTime;
         return this;
     }
@@ -617,16 +618,21 @@ public final class EasyHttp {
      * 移除缓存（key）
      */
     public static void removeCache(String key) {
-        getRxCache().remove(key).compose(RxUtil.<Boolean>io_main()).subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(@NonNull Boolean aBoolean) throws Exception {
-                HttpLog.i("removeCache success!!!");
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(@NonNull Throwable throwable) throws Exception {
-                    HttpLog.i("removeCache err!!!");
-            }
-        });
+        getRxCache()
+                .remove(key)
+                .compose(RxUtil.<Boolean>io_main())
+                .subscribe(
+                        new Consumer<Boolean>() {
+                            @Override
+                            public void accept(@NonNull Boolean aBoolean) throws Exception {
+                                HttpLog.i("removeCache success!!!");
+                            }
+                        },
+                        new Consumer<Throwable>() {
+                            @Override
+                            public void accept(@NonNull Throwable throwable) throws Exception {
+                                HttpLog.i("removeCache err!!!");
+                            }
+                        });
     }
 }

@@ -35,7 +35,6 @@ import io.reactivex.annotations.NonNull;
 public class CallBackSubsciber<T> extends BaseSubscriber<T> {
     public CallBack<T> mCallBack;
     
-
     public CallBackSubsciber(Context context, CallBack<T> callBack) {
         super(context);
         mCallBack = callBack;

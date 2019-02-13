@@ -36,8 +36,8 @@ import java.lang.reflect.Type;
  *
  * 修改者： zhouyou<br>
  * 日期： 2016/01/07 10:35<br>
- *  1.为了更好的扩展功能，统一使用BasicCache<br>
- *  2.将来做内存管理也可以继承BasicCache来统一处理<br>
+ *  1.为了更好的扩展功能，统一使用BaseCache<br>
+ *  2.将来做内存管理也可以继承BaseCache来统一处理<br>
  */
 public class LruDiskCache extends BaseCache {
     private IDiskConverter mDiskConverter;

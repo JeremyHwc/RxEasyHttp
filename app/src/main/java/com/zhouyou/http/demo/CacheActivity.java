@@ -104,7 +104,8 @@ public class CacheActivity extends AppCompatActivity implements View.OnClickList
      * new SimpleCallBack<String>()//返回字符串<br>
      */
     private void requestCahce() {
-        EasyHttp.get("/v1/app/chairdressing/skinAnalyzePower/skinTestResult")
+        EasyHttp
+                .get("/v1/app/chairdressing/skinAnalyzePower/skinTestResult")
                 .readTimeOut(30 * 1000)//测试局部读超时30s
                 .cacheMode(cacheMode)
                 .cacheKey(this.getClass().getSimpleName())//缓存key
@@ -149,7 +150,8 @@ public class CacheActivity extends AppCompatActivity implements View.OnClickList
      * execute(CacheResult<SkinTestResult> clazz)<br>
      */
     private void requestCahce2() {
-        EasyHttp.get("/v1/app/chairdressing/skinAnalyzePower/skinTestResult")
+        EasyHttp
+                .get("/v1/app/chairdressing/skinAnalyzePower/skinTestResult")
                 .readTimeOut(30 * 1000)//测试局部读超时30s
                 .cacheMode(cacheMode)
                 .cacheKey(this.getClass().getSimpleName())//缓存key
@@ -204,10 +206,11 @@ public class CacheActivity extends AppCompatActivity implements View.OnClickList
                 //获取缓存需要指定下转换器，默认就是SerializableDiskConverter 这里可以不用写
                 //就是你网络请求用哪个转换器存储的缓存，那么读取时也要采用对应的转换器读取
                 .diskConverter(new SerializableDiskConverter()).build()
-                 //这个表示读取缓存根据时间,读取指定时间内的缓存，例如读取:5*60s之内的缓存
+                //这个表示读取缓存根据时间,读取指定时间内的缓存，例如读取:5*60s之内的缓存
                 //.load(new TypeToken<SkinTestResult>() {}.getType(), this.getClass().getSimpleName(), 5 * 60)
-                 //这个表示读取缓存不根据时间只要有缓存就读取
-                .load(new TypeToken<SkinTestResult>() {}.getType(), this.getClass().getSimpleName());
+                //这个表示读取缓存不根据时间只要有缓存就读取
+                .load(new TypeToken<SkinTestResult>() {
+                }.getType(), this.getClass().getSimpleName());
         observable.subscribe(new BaseSubscriber<SkinTestResult>() {
             @Override
             public void onError(ApiException e) {

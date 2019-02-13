@@ -72,7 +72,6 @@ public abstract class BaseCache {
      *
      * @param key   缓存key
      * @param value 缓存内容
-     * @return
      */
     final <T> boolean save(String key, T value) {
         //1.先检查key

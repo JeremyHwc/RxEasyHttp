@@ -44,7 +44,7 @@ import okhttp3.ResponseBody;
  * 日期： 2017/4/28 14:28 <br>
  * 版本： v1.0<br>
  */
-@SuppressWarnings(value={"unchecked", "deprecation"})
+@SuppressWarnings(value = {"unchecked", "deprecation"})
 public class GetRequest extends BaseRequest<GetRequest> {
     public GetRequest(String url) {
         super(url);
@@ -61,7 +61,8 @@ public class GetRequest extends BaseRequest<GetRequest> {
     }
 
     public <T> Observable<T> execute(CallClazzProxy<? extends ApiResult<T>, T> proxy) {
-        return build().generateRequest()
+        return build()
+                .generateRequest()
                 .map(new ApiResultFunc(proxy.getType()))
                 .compose(isSyncRequest ? RxUtil._main() : RxUtil._io_main())
                 .compose(rxCache.transformer(cacheMode, proxy.getCallType()))
@@ -80,24 +81,30 @@ public class GetRequest extends BaseRequest<GetRequest> {
     }
 
     public <T> Disposable execute(CallBackProxy<? extends ApiResult<T>, T> proxy) {
-        Observable<CacheResult<T>> observable = build().toObservable(apiManager.get(url, params.urlParamsMap), proxy);
+        Observable<CacheResult<T>> observable = build()
+                .toObservable(apiManager.get(url, params.urlParamsMap), proxy);
+
         if (CacheResult.class != proxy.getCallBack().getRawType()) {
-            return observable.compose(new ObservableTransformer<CacheResult<T>, T>() {
-                @Override
-                public ObservableSource<T> apply(@NonNull Observable<CacheResult<T>> upstream) {
-                    return upstream.map(new CacheResultFunc<T>());
-                }
-            }).subscribeWith(new CallBackSubsciber<T>(context, proxy.getCallBack()));
+            return observable
+                    .compose(new ObservableTransformer<CacheResult<T>, T>() {
+                        @Override
+                        public ObservableSource<T> apply(@NonNull Observable<CacheResult<T>> upstream) {
+                            return upstream.map(new CacheResultFunc<T>());
+                        }
+                    })
+                    .subscribeWith(new CallBackSubsciber<T>(context, proxy.getCallBack()));
         } else {
             return observable.subscribeWith(new CallBackSubsciber<CacheResult<T>>(context, proxy.getCallBack()));
         }
     }
 
-    private <T> Observable<CacheResult<T>> toObservable(Observable observable, CallBackProxy<? extends ApiResult<T>, T> proxy) {
-        return observable.map(new ApiResultFunc(proxy != null ? proxy.getType() : new TypeToken<ResponseBody>() {
-        }.getType()))
-                .compose(isSyncRequest ? RxUtil._main() : RxUtil._io_main())
-                .compose(rxCache.transformer(cacheMode, proxy.getCallBack().getType()))
+    private <T> Observable<CacheResult<T>> toObservable(Observable observable,
+                                                        CallBackProxy<? extends ApiResult<T>, T> proxy) {
+        return observable
+                .map(new ApiResultFunc(proxy != null ? proxy.getType() : new TypeToken<ResponseBody>() {
+                }.getType()))
+                .compose(isSyncRequest ? RxUtil._main() : RxUtil._io_main())//线程变换
+                .compose(rxCache.transformer(cacheMode, proxy.getCallBack().getType()))//缓存变换
                 .retryWhen(new RetryExceptionFunc(retryCount, retryDelay, retryIncreaseDelay));
     }
 

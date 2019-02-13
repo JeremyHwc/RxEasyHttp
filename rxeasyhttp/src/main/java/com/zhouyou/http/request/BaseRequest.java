@@ -109,12 +109,12 @@ public abstract class BaseRequest<R extends BaseRequest> {
         context = EasyHttp.getContext();
         EasyHttp config = EasyHttp.getInstance();
         this.baseUrl = config.getBaseUrl();
-        if (!TextUtils.isEmpty(this.baseUrl)){
+        if (!TextUtils.isEmpty(this.baseUrl)) {
             httpUrl = HttpUrl.parse(baseUrl);
         }
         if (baseUrl == null && url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
             httpUrl = HttpUrl.parse(url);
-            baseUrl =httpUrl.url().getProtocol()+"://" +httpUrl.url().getHost()+"/";
+            baseUrl = httpUrl.url().getProtocol() + "://" + httpUrl.url().getHost() + "/";
         }
         cacheMode = config.getCacheMode();                                //添加缓存模式
         cacheTime = config.getCacheTime();                                //缓存时间
@@ -510,12 +510,14 @@ public abstract class BaseRequest<R extends BaseRequest> {
                 interceptors.add(new NoCacheInterceptor());
                 if (diskConverter == null) {
                     final RxCache.Builder tempRxCacheBuilder = rxCacheBuilder;
-                    tempRxCacheBuilder.cachekey(Utils.checkNotNull(cacheKey, "cacheKey == null"))
+                    tempRxCacheBuilder
+                            .cachekey(Utils.checkNotNull(cacheKey, "cacheKey == null"))
                             .cacheTime(cacheTime);
                     return tempRxCacheBuilder;
                 } else {
                     final RxCache.Builder cacheBuilder = getRxCache().newBuilder();
-                    cacheBuilder.diskConverter(diskConverter)
+                    cacheBuilder
+                            .diskConverter(diskConverter)
                             .cachekey(Utils.checkNotNull(cacheKey, "cacheKey == null"))
                             .cacheTime(cacheTime);
                     return cacheBuilder;
@@ -526,14 +528,17 @@ public abstract class BaseRequest<R extends BaseRequest> {
 
     protected R build() {
         final RxCache.Builder rxCacheBuilder = generateRxCache();
+
         OkHttpClient.Builder okHttpClientBuilder = generateOkClient();
         if (cacheMode == CacheMode.DEFAULT) {//okhttp缓存
             okHttpClientBuilder.cache(cache);
         }
+
         final Retrofit.Builder retrofitBuilder = generateRetrofit();
         okHttpClient = okHttpClientBuilder.build();
         retrofitBuilder.client(okHttpClient);
         retrofit = retrofitBuilder.build();
+
         rxCache = rxCacheBuilder.build();
         apiManager = retrofit.create(ApiService.class);
         return (R) this;

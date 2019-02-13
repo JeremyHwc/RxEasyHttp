@@ -49,7 +49,6 @@ public class CacheCore {
         this.disk = Utils.checkNotNull(disk, "disk==null");
     }
 
-
     /**
      * 读取
      */
@@ -62,7 +61,6 @@ public class CacheCore {
                 return result;
             }
         }
-
         return null;
     }
 
@@ -77,9 +75,6 @@ public class CacheCore {
 
     /**
      * 是否包含
-     *
-     * @param key
-     * @return
      */
     public synchronized boolean containsKey(String key) {
         String cacheKey = ByteString.of(key.getBytes()).md5().hex();

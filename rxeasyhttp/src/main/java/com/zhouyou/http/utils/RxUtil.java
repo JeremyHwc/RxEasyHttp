@@ -40,6 +40,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class RxUtil {
 
+    /**
+     * 被观察者在io线程，观察者在主线程
+     */
     public static <T> ObservableTransformer<T, T> io_main() {
         return new ObservableTransformer<T, T>() {
             @Override
@@ -64,6 +67,9 @@ public class RxUtil {
         };
     }
 
+    /**
+     * 被观察者在io线程，观察者在主线程
+     */
     public static <T> ObservableTransformer<ApiResult<T>, T> _io_main() {
         return new ObservableTransformer<ApiResult<T>, T>() {
             @Override
